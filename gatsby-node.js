@@ -1,9 +1,7 @@
 const prettier = require('prettier')
-const glob = require('glob')
-const { readFileSync, writeFileSync } = require('fs')
+const glob = require('tiny-glob')
+const { readFileSync, writeFileSync, statSync } = require('fs')
 const { extname } = require('path')
-
-// TODO: Validate config on pre init
 
 const extParsers = {
   js: 'babel',
@@ -11,59 +9,49 @@ const extParsers = {
   css: 'css',
 }
 
-const getFilePathsToFormat = (types) => {
-  if (!types.length) return Promise.resolve([])
+exports.onPreInit = (_, opts) => {
+  return new Promise((resolve, reject) => {
+    for (const type of opts.types) {
+      if (!extParsers[type])
+        return reject(
+          `gatsby-plugin-prettier-build doesn't support '${type}' files\n` +
+            `raise an issue? https://github.com/jmsv/gatsby-plugin-prettier-build/issues/new`
+        )
+    }
 
-  const globPattern = `public/**/*.${
-    types.length === 1 ? types[0] : `{${types.join(',')}}`
-  }`
-
-  return new Promise((resolve, reject) =>
-    glob(globPattern, {}, (err, files) => {
-      if (err) return reject(err)
-      return resolve(files)
-    })
-  )
+    return resolve()
+  })
 }
 
-exports.onPostBuild = (_, opts) => {
+exports.onPostBuild = async (_, opts) => {
   const fileTypesToFormat = opts.types || ['html']
   const verbose = opts.verbose !== false
 
-  return Promise.all([
+  const [prettierOpts, files] = await Promise.all([
     prettier.resolveConfig(process.cwd()),
-    getFilePathsToFormat(fileTypesToFormat),
-  ]).then(([prettierOpts, files]) => {
-    for (const filePath of files) {
-      // TODO: Check isn't directory instead of below line
-      if (filePath.includes('page-data')) break
+    glob(`public/**/*.{${fileTypesToFormat.join(',')}}`),
+  ])
 
-      const fileType = extname(filePath).slice(1)
-      const parser = extParsers[fileType]
+  for (const filePath of files) {
+    if (!statSync(filePath).isFile()) continue
 
-      if (!parser)
-        return reject(
-          `gatsby-plugin-prettier-build doesn't support ${fileType} files yet`
-        )
+    const parser = extParsers[extname(filePath).slice(1)]
 
-      const contents = readFileSync(filePath).toString()
+    const formatted = prettier.format(
+      readFileSync(filePath).toString(),
+      Object.assign({ parser }, prettierOpts)
+    )
 
-      // TODO: `prettier.check` before format
-      const formatted = prettier.format(
-        contents,
-        Object.assign({ parser }, prettierOpts)
-      )
+    writeFileSync(filePath, formatted)
 
-      writeFileSync(filePath, formatted)
+    if (verbose) console.log('✔ prettified', filePath)
+  }
 
-      if (verbose) console.log('✔ prettified', filePath)
-    }
-
-    if (verbose)
-      console.log(
-        `✨ finished prettifying ${files.length} Gatsby output file${
-          files.length ? 's' : ''
-        }`
-      )
-  })
+  if (verbose) {
+    console.log(
+      `✨ finished prettifying ${files.length} Gatsby build file${
+        files.length ? 's' : ''
+      }`
+    )
+  }
 }
