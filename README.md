@@ -2,6 +2,8 @@
 
 prettify gatsby build output
 
+[![npm version](https://badge.fury.io/js/gatsby-plugin-prettier-build.svg)](https://badge.fury.io/js/gatsby-plugin-prettier-build)
+
 ## Why?
 
 [![wesbos-tweet](https://user-images.githubusercontent.com/14852491/78827410-02ccdb00-79db-11ea-9369-74c0ada99cf4.png)](https://twitter.com/wesbos/status/1247903517051768839)
