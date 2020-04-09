@@ -57,6 +57,10 @@ Whether or not to log progress to the console
 
 ## Changelog
 
+#### `0.3.0`
+
+- Prettify files asynchronously with `Promise.all`
+
 #### `0.2.0`
 
 - Replace `glob` with `tiny-glob` (smaller and faster)
