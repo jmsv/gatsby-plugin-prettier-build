@@ -1,6 +1,6 @@
 const prettier = require('prettier')
 const glob = require('tiny-glob')
-const { readFileSync, writeFileSync, statSync } = require('fs')
+const fs = require('fs').promises
 const { extname } = require('path')
 
 const extParsers = {
@@ -32,26 +32,35 @@ exports.onPostBuild = async (_, opts) => {
     glob(`public/**/*.{${fileTypesToFormat.join(',')}}`),
   ])
 
-  for (const filePath of files) {
-    if (!statSync(filePath).isFile()) continue
-
-    const parser = extParsers[extname(filePath).slice(1)]
-
-    const formatted = prettier.format(
-      readFileSync(filePath).toString(),
-      Object.assign({ parser }, prettierOpts)
+  return Promise.all(
+    files.map((filePath) =>
+      prettifyFile(filePath, prettierOpts).then(() => {
+        if (verbose) console.log('✔ prettified', filePath)
+      })
     )
+  ).then(() => {
+    if (verbose) {
+      console.log(
+        `✨ finished prettifying ${files.length} Gatsby build file${
+          files.length ? 's' : ''
+        }`
+      )
+    }
+  })
+}
 
-    writeFileSync(filePath, formatted)
+const prettifyFile = async (filePath, prettierOpts) => {
+  // Don't attempt format if not a file
+  if (!(await fs.lstat(filePath)).isFile()) return
 
-    if (verbose) console.log('✔ prettified', filePath)
-  }
+  const parser = extParsers[extname(filePath).slice(1)]
 
-  if (verbose) {
-    console.log(
-      `✨ finished prettifying ${files.length} Gatsby build file${
-        files.length ? 's' : ''
-      }`
-    )
-  }
+  const fileBuffer = await fs.readFile(filePath)
+
+  const formatted = prettier.format(
+    fileBuffer.toString(),
+    Object.assign({ parser }, prettierOpts)
+  )
+
+  await fs.writeFile(filePath, formatted)
 }
