@@ -55,7 +55,18 @@ For example, to prettify all supported types: `['html', 'js', 'css']`
 
 Whether or not to log progress to the console
 
+#### `concurrency`
+
+> default: `20`
+
+How many files to prettify at once
+
 ## Changelog
+
+#### `0.4.0`
+
+- Limit prettify concurrency with new `concurrency` option (defaults to `20`)
+- Fix issue with counting number of prettified files
 
 #### `0.3.0`
 

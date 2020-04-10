@@ -1,7 +1,8 @@
+const fs = require('fs').promises
+const path = require('path')
 const prettier = require('prettier')
 const glob = require('tiny-glob')
-const fs = require('fs').promises
-const { extname } = require('path')
+const pLimit = require('p-limit')
 
 const extParsers = {
   js: 'babel',
@@ -32,17 +33,25 @@ exports.onPostBuild = async (_, opts) => {
     glob(`public/**/*.{${fileTypesToFormat.join(',')}}`),
   ])
 
+  const limit = pLimit(opts.concurrency || 20)
+  let filesPrettified = 0
+
   return Promise.all(
     files.map((filePath) =>
-      prettifyFile(filePath, prettierOpts).then(() => {
-        if (verbose) console.log('✔ prettified', filePath)
-      })
+      limit(() =>
+        prettifyFile(filePath, prettierOpts).then((done) => {
+          if (done) {
+            filesPrettified += 1
+            if (verbose) console.log('✔ prettified', filePath)
+          }
+        })
+      )
     )
   ).then(() => {
     if (verbose) {
       console.log(
-        `✨ finished prettifying ${files.length} Gatsby build file${
-          files.length ? 's' : ''
+        `✨ finished prettifying ${filesPrettified} Gatsby build file${
+          filesPrettified ? 's' : ''
         }`
       )
     }
@@ -51,9 +60,9 @@ exports.onPostBuild = async (_, opts) => {
 
 const prettifyFile = async (filePath, prettierOpts) => {
   // Don't attempt format if not a file
-  if (!(await fs.lstat(filePath)).isFile()) return
+  if (!(await fs.lstat(filePath)).isFile()) return false
 
-  const parser = extParsers[extname(filePath).slice(1)]
+  const parser = extParsers[path.extname(filePath).slice(1)]
 
   const fileBuffer = await fs.readFile(filePath)
 
@@ -63,4 +72,6 @@ const prettifyFile = async (filePath, prettierOpts) => {
   )
 
   await fs.writeFile(filePath, formatted)
+
+  return true
 }
