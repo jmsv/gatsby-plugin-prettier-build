@@ -34,20 +34,24 @@ exports.onPostBuild = async (_, opts) => {
   ])
 
   const limit = pLimit(opts.concurrency || 20)
+  let filesPrettified = 0
 
   return Promise.all(
     files.map((filePath) =>
       limit(() =>
-        prettifyFile(filePath, prettierOpts).then(() => {
-          if (verbose) console.log('✔ prettified', filePath)
+        prettifyFile(filePath, prettierOpts).then((done) => {
+          if (done) {
+            filesPrettified += 1
+            if (verbose) console.log('✔ prettified', filePath)
+          }
         })
       )
     )
   ).then(() => {
     if (verbose) {
       console.log(
-        `✨ finished prettifying ${files.length} Gatsby build file${
-          files.length ? 's' : ''
+        `✨ finished prettifying ${filesPrettified} Gatsby build file${
+          filesPrettified ? 's' : ''
         }`
       )
     }
@@ -56,7 +60,7 @@ exports.onPostBuild = async (_, opts) => {
 
 const prettifyFile = async (filePath, prettierOpts) => {
   // Don't attempt format if not a file
-  if (!(await fs.lstat(filePath)).isFile()) return
+  if (!(await fs.lstat(filePath)).isFile()) return false
 
   const parser = extParsers[path.extname(filePath).slice(1)]
 
@@ -68,4 +72,6 @@ const prettifyFile = async (filePath, prettierOpts) => {
   )
 
   await fs.writeFile(filePath, formatted)
+
+  return true
 }
