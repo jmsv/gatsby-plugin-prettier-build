@@ -30,6 +30,7 @@ Or to provide custom options:
   options: {
     // default values
     types: ['html'],
+    concurrency: 20,
     verbose: true
   }
 }
@@ -62,6 +63,10 @@ Whether or not to log progress to the console
 How many files to prettify at once
 
 ## Changelog
+
+#### `0.4.1`
+
+- Docs fix
 
 #### `0.4.0`
 
