@@ -55,6 +55,12 @@ For example, to prettify all supported types: `['html', 'js', 'css']`
 
 Whether or not to log progress to the console
 
+#### `concurrency`
+
+> default: `20`
+
+How many files to prettify at once
+
 ## Changelog
 
 #### `0.3.0`
