@@ -29,6 +29,7 @@
   },
   "homepage": "https://github.com/jmsv/gatsby-plugin-prettier-build#readme",
   "dependencies": {
+    "p-limit": "^2.3.0",
     "prettier": "^2.0.4",
     "tiny-glob": "^0.2.6"
   }
