@@ -63,6 +63,11 @@ How many files to prettify at once
 
 ## Changelog
 
+#### `0.4.0`
+
+- Limit prettify concurrency with new `concurrency` option (defaults to `20`)
+- Fix issue with counting number of prettified files
+
 #### `0.3.0`
 
 - Prettify files asynchronously with `Promise.all`
