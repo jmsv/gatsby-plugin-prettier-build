@@ -62,6 +62,8 @@ Whether or not to log progress to the console
 
 How many files to prettify at once
 
+You can remove the concurrency limit with `concurrency: Infinity` although this isn't recommended
+
 ## Changelog
 
 #### `0.4.1`
