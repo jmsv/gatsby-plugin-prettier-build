@@ -10,8 +10,10 @@ const extParsers = {
   css: 'css',
 }
 
-exports.onPreInit = (_, opts) => {
+exports.onPreInit = (_, opts = {}) => {
   return new Promise((resolve, reject) => {
+    if (!opts.types) return resolve()
+
     for (const type of opts.types) {
       if (!extParsers[type])
         return reject(
@@ -24,7 +26,7 @@ exports.onPreInit = (_, opts) => {
   })
 }
 
-exports.onPostBuild = async (_, opts) => {
+exports.onPostBuild = async (_, opts = {}) => {
   const fileTypesToFormat = opts.types || ['html']
   const verbose = opts.verbose !== false
 
