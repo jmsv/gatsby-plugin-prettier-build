@@ -20,7 +20,12 @@ yarn add gatsby-plugin-prettier-build
 
 In `gatsby-config.js` plugins array:
 
-To stick to default options (see defaults below) add `'gatsby-plugin-prettier-build'`.
+To stick to default options (see defaults below) add:
+
+<!-- prettier-ignore -->
+```js
+`gatsby-plugin-prettier-build`
+```
 
 Or to provide custom options:
 
