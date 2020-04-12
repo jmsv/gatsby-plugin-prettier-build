@@ -66,6 +66,10 @@ You can remove the concurrency limit with `concurrency: Infinity` although this 
 
 ## Changelog
 
+#### `0.4.2`
+
+- Fix bug where undefined `types` option throws error on `onPreInit` options validation
+
 #### `0.4.1`
 
 - Docs fix
