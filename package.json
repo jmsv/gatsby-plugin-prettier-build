@@ -16,7 +16,8 @@
     "prettier",
     "gatsby",
     "gatsbyjs",
-    "plugin"
+    "plugin",
+    "gatsby-plugin"
   ],
   "author": {
     "name": "James Vickery",
