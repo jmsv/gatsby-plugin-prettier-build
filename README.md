@@ -71,6 +71,11 @@ You can remove the concurrency limit with `concurrency: Infinity` although this 
 
 ## Changelog
 
+#### `0.4.3`
+
+- Add `gatsby-plugin` to package keywords [#2](https://github.com/jmsv/gatsby-plugin-prettier-build/pull/2) (thanks [@KyleAMathews](https://github.com/KyleAMathews))
+- Minor docs fix
+
 #### `0.4.2`
 
 - Fix bug where undefined `types` option throws error on `onPreInit` options validation
