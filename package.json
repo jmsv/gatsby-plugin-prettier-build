@@ -1,6 +1,6 @@
 {
   "name": "gatsby-plugin-prettier-build",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "description": "prettify gatsby build output",
   "main": "index.js",
   "scripts": {
