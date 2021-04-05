@@ -42,9 +42,11 @@ exports.onPostBuild = async (_, opts = {}) => {
     files.map((filePath) =>
       limit(() =>
         prettifyFile(filePath, prettierOpts).then((done) => {
-          if (done) {
+          if (done === true) {
             filesPrettified += 1
             if (verbose) console.log('✔ prettified', filePath)
+          } else if (done === false) {
+            if (verbose) console.log('✘ failed to prettify', filePath)
           }
         })
       )
@@ -62,18 +64,22 @@ exports.onPostBuild = async (_, opts = {}) => {
 
 const prettifyFile = async (filePath, prettierOpts) => {
   // Don't attempt format if not a file
-  if (!(await fs.lstat(filePath)).isFile()) return false
+  if (!(await fs.lstat(filePath)).isFile()) return null
 
   const parser = extParsers[path.extname(filePath).slice(1)]
 
   const fileBuffer = await fs.readFile(filePath)
 
-  const formatted = prettier.format(
-    fileBuffer.toString(),
-    Object.assign({ parser }, prettierOpts)
-  )
+  try {
+    const formatted = prettier.format(
+      fileBuffer.toString(),
+      Object.assign({ parser }, prettierOpts)
+    )
 
-  await fs.writeFile(filePath, formatted)
+    await fs.writeFile(filePath, formatted)
+  } catch {
+    return false
+  }
 
   return true
 }

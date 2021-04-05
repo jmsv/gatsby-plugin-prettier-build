@@ -71,6 +71,10 @@ You can remove the concurrency limit with `concurrency: Infinity` although this 
 
 ## Changelog
 
+#### `0.4.4`
+
+- Stop plugin from breaking on prettier failure
+
 #### `0.4.3`
 
 - Add `gatsby-plugin` to package keywords [#2](https://github.com/jmsv/gatsby-plugin-prettier-build/pull/2) (thanks [@KyleAMathews](https://github.com/KyleAMathews))
